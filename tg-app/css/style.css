@@ -1,0 +1,514 @@
+/* =========================================================================
+   style.css — стили приложения.
+   Логика цвета: переменные --tg-* задают палитру. По умолчанию (фолбэк
+   для браузера) берутся значения ниже; внутри настоящего Telegram
+   telegram.js перезаписывает их значениями из themeParams — тогда
+   приложение выглядит ровно как текущая тема пользователя (светлая/тёмная).
+   ========================================================================= */
+
+:root {
+  --accent: #2AABEE; /* фирменный акцент по ТЗ */
+  --tg-bg: #FFFFFF;
+  --tg-secondary-bg: #F2F2F5;
+  --tg-section-bg: #FFFFFF;
+  --tg-text: #0F0F0F;
+  --tg-hint: #8E8E93;
+  --tg-link: #2AABEE;
+  --tg-button: #2AABEE;
+  --tg-button-text: #FFFFFF;
+  --separator: rgba(0, 0, 0, 0.08);
+  --shadow-soft: 0 2px 14px rgba(20, 20, 20, 0.06);
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --tg-bg: #17212B;
+    --tg-secondary-bg: #1E2733;
+    --tg-section-bg: #232E3C;
+    --tg-text: #FFFFFF;
+    --tg-hint: #7D8B99;
+    --tg-link: #6AB3F3;
+    --tg-button: #2AABEE;
+    --tg-button-text: #FFFFFF;
+    --separator: rgba(255, 255, 255, 0.08);
+    --shadow-soft: 0 2px 14px rgba(0, 0, 0, 0.4);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* никакой горизонтальной прокрутки страницы */
+  background: var(--tg-bg);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--tg-text);
+  -webkit-tap-highlight-color: transparent; /* убираем серую вспышку при тапе — свой фидбек ниже */
+  min-height: 100vh;
+}
+
+/* Мобильный экран 320–430px; на широком браузере просто центрируем колонку телефона */
+#app {
+  max-width: 430px;
+  min-width: 320px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  background: var(--tg-bg);
+}
+
+button, input, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+h1, h2, p, ul { margin: 0; }
+
+/* ---------------------------- контейнер экранов + анимации ---------------------------- */
+
+#screen-container {
+  padding-top: var(--safe-top);
+  padding-bottom: calc(96px + var(--safe-bottom)); /* место под таббар/MainButton */
+  min-height: 100vh;
+  overflow: hidden; /* чтобы слайд-анимация не создавала горизонтальный скролл */
+}
+
+/* Фолбэк-кнопка "Назад" (только вне настоящего Telegram) рисуется поверх страницы —
+   освобождаем под неё место сверху, чтобы не перекрывала заголовок экрана */
+body.has-fallback-back-button #screen-container { padding-top: calc(52px + var(--safe-top)); }
+
+.screen { animation-duration: 260ms; animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1); animation-fill-mode: both; }
+.screen-in-right { animation-name: slideInRight; }
+.screen-in-left { animation-name: slideInLeft; }
+.screen-in-fade { animation-name: fadeIn; }
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-28px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.screen-pad { padding: 16px 16px 8px; }
+
+.screen-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.section-title { font-size: 17px; font-weight: 700; margin: 20px 0 10px; }
+.hint { color: var(--tg-hint); font-size: 14px; }
+
+/* ---------------------------- тактильный фидбек на касания ---------------------------- */
+
+.tappable { cursor: pointer; transition: transform 100ms ease, opacity 100ms ease; }
+.tappable:active,
+.tappable.is-pressed { transform: scale(0.97); opacity: 0.85; }
+
+/* ---------------------------- нижний таббар ---------------------------- */
+
+#tabbar {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  display: flex;
+  background: var(--tg-section-bg);
+  border-top: 1px solid var(--separator);
+  padding-bottom: var(--safe-bottom);
+  z-index: 20;
+}
+#tabbar.is-hidden { display: none; }
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 0 10px;
+  background: none;
+  border: none;
+  min-height: 44px;
+  color: var(--tg-hint);
+}
+.tab-emoji { font-size: 22px; }
+.tab-label { font-size: 11px; }
+.tab.is-active { color: var(--accent); }
+
+/* ---------------------------- нативная главная кнопка (MainButton) ---------------------------- */
+
+.fallback-main-button {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  min-height: 50px;
+  padding: 0 16px;
+  padding-bottom: var(--safe-bottom);
+  margin-bottom: 0;
+  background: var(--tg-button);
+  color: var(--tg-button-text);
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+.fallback-main-button.is-disabled { opacity: 0.5; }
+.fallback-main-button.is-loading { opacity: 0.7; }
+body.has-fallback-main-button #tabbar { display: none; }
+
+.fallback-back-button {
+  display: none;
+  position: fixed;
+  top: calc(10px + var(--safe-top));
+  left: max(10px, calc(50% - 205px));
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--tg-section-bg);
+  box-shadow: var(--shadow-soft);
+  color: var(--tg-link);
+  font-size: 22px;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+
+/* ---------------------------- общие кнопки ---------------------------- */
+
+.secondary-button {
+  width: 100%;
+  min-height: 44px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--separator);
+  background: var(--tg-section-bg);
+  color: var(--tg-link);
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+/* ---------------------------- приветственный экран ---------------------------- */
+
+.welcome-screen { padding-top: 15vh; text-align: center; }
+.welcome-hero { margin-bottom: 24px; }
+.welcome-title { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+.welcome-subtitle { color: var(--tg-hint); font-size: 15px; }
+
+/* ---------------------------- иконка-кружок ---------------------------- */
+
+.icon-circle {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+/* ---------------------------- визуал "до / после" ---------------------------- */
+
+.before-after {
+  display: flex;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  height: 180px;
+  box-shadow: var(--shadow-soft);
+}
+.ba-half {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 42px;
+  background: linear-gradient(135deg, #2AABEE, #8E5CF7);
+  position: relative;
+  color: #fff;
+}
+.ba-before { background: linear-gradient(135deg, #b9c2cc, #7c8794); }
+.ba-tag {
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* ---------------------------- каталог: шапка и поиск ---------------------------- */
+
+.catalog-header h1 { font-size: 22px; font-weight: 700; }
+.catalog-header { margin-bottom: 14px; }
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--tg-secondary-bg);
+  border-radius: var(--radius-md);
+  padding: 0 14px;
+  height: 44px;
+  margin-bottom: 20px;
+}
+.search-icon { font-size: 16px; opacity: 0.6; }
+.search-input {
+  border: none;
+  background: none;
+  outline: none;
+  flex: 1;
+  height: 100%;
+  font-size: 15px;
+}
+.search-input::placeholder { color: var(--tg-hint); }
+
+/* ---------------------------- сетка категорий ---------------------------- */
+
+.category-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.category-tile {
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  text-align: left;
+}
+.category-emoji { font-size: 26px; }
+.category-title { font-size: 14px; font-weight: 600; margin-top: 8px; }
+
+/* ---------------------------- список услуг / карточки ---------------------------- */
+
+.service-list { display: flex; flex-direction: column; gap: 8px; }
+
+.service-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px;
+  background: var(--tg-section-bg);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-md);
+  text-align: left;
+}
+.service-card-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.service-card-title { font-size: 15px; font-weight: 600; }
+.service-card-meta { font-size: 13px; color: var(--tg-hint); }
+.chevron { color: var(--tg-hint); font-size: 20px; }
+
+/* ---------------------------- карточка услуги: галерея ---------------------------- */
+
+.gallery {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 0;
+}
+.gallery-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  padding: 0;
+}
+.gallery-slide .before-after { border-radius: 0; height: 220px; }
+
+.service-price-row { display: flex; align-items: baseline; gap: 8px; margin: 10px 0 12px; }
+.service-price { font-size: 20px; font-weight: 800; color: var(--accent); }
+.dot { color: var(--tg-hint); }
+.service-duration { color: var(--tg-hint); font-size: 14px; }
+.service-description { font-size: 15px; margin-bottom: 14px; }
+
+.feature-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.feature-list li { font-size: 14px; }
+
+/* ---------------------------- форма брифа ---------------------------- */
+
+.field-label { display: block; font-size: 13px; font-weight: 600; color: var(--tg-hint); margin: 18px 0 8px; }
+
+.attach-zone {
+  width: 100%;
+  min-height: 52px;
+  border-radius: var(--radius-md);
+  border: 1.5px dashed var(--separator);
+  background: var(--tg-secondary-bg);
+  font-size: 14px;
+  color: var(--tg-link);
+}
+
+.textarea {
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--separator);
+  background: var(--tg-secondary-bg);
+  padding: 12px;
+  font-size: 15px;
+  resize: none;
+  outline: none;
+}
+.textarea:focus { border-color: var(--accent); }
+
+.chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 22px;
+  border: 1px solid var(--separator);
+  background: var(--tg-secondary-bg);
+  font-size: 14px;
+  font-weight: 600;
+}
+.chip.is-active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--separator);
+  font-size: 15px;
+  font-weight: 600;
+}
+.summary-price { font-size: 18px; font-weight: 800; color: var(--accent); }
+
+/* ---------------------------- экран оплаты ---------------------------- */
+
+.summary-card {
+  background: var(--tg-section-bg);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  margin-top: 12px;
+}
+.summary-line { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; }
+.summary-line span:first-child { color: var(--tg-hint); }
+.summary-total { border-top: 1px solid var(--separator); margin-top: 4px; padding-top: 12px; font-size: 16px; font-weight: 700; }
+.summary-total span:first-child { color: var(--tg-text); }
+.payment-hint { text-align: center; margin-top: 18px; }
+
+/* ---------------------------- статус заказа ---------------------------- */
+
+.status-stepper { display: flex; flex-direction: column; gap: 0; margin: 20px 0; }
+.status-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  position: relative;
+  color: var(--tg-hint);
+}
+.status-step::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 34px;
+  bottom: -10px;
+  width: 2px;
+  background: var(--separator);
+}
+.status-step:last-child::before { display: none; }
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--separator);
+  flex-shrink: 0;
+}
+.status-step.is-done { color: var(--tg-text); }
+.status-step.is-done .status-dot { background: var(--accent); }
+.status-step.is-current .status-label { font-weight: 700; }
+.status-eta { margin-bottom: 8px; }
+
+/* ---------------------------- результат ---------------------------- */
+
+.result-actions { display: flex; gap: 8px; margin-top: 4px; }
+.result-actions .secondary-button { margin-top: 0; }
+
+/* ---------------------------- мои заказы ---------------------------- */
+
+.order-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.order-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px;
+  background: var(--tg-section-bg);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-md);
+  text-align: left;
+}
+.order-row-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.order-row-title { font-size: 15px; font-weight: 600; }
+.order-row-date { font-size: 13px; }
+
+.badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+.badge-new { background: #FFF1D6; color: #B8790A; }
+.badge-progress { background: #DCEBFF; color: #1B67C2; }
+.badge-done { background: #DDF5E4; color: #1E8A4C; }
+
+.empty-state { text-align: center; padding-top: 20vh; }
+.empty-emoji { font-size: 44px; display: block; margin-bottom: 12px; }
+
+/* ---------------------------- профиль ---------------------------- */
+
+.profile-card { display: flex; align-items: center; gap: 12px; margin: 16px 0 22px; }
+.profile-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #8E5CF7);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.profile-name { font-size: 17px; font-weight: 700; }
+
+.profile-menu { display: flex; flex-direction: column; gap: 8px; }
+.profile-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  background: var(--tg-section-bg);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  text-align: left;
+}
