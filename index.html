@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!--
+  index.html — единственная точка входа Mini App.
+  Дальше всё живёт внутри #screen-container: экраны подменяются через JS
+  (router.js), без перезагрузки страницы — поэтому приложение ощущается
+  как нативное, а не как переход по сайту.
+-->
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <!-- viewport-fit=cover + user-scalable=no — приложение занимает весь экран телефона без зума и без "браузерных" отступов -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Нейро.Студия</title>
+
+  <!-- Официальный Telegram Web App SDK: даёт доступ к теме, MainButton/BackButton, данным пользователя и т.д. -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Сюда router.js вставляет разметку текущего экрана -->
+    <main id="screen-container"></main>
+
+    <!-- Нижняя навигация: видна только на "корневых" вкладках (см. ROOT_TABS в router.js) -->
+    <nav id="tabbar">
+      <button class="tab" data-tab="catalog">
+        <span class="tab-emoji">🗂️</span>
+        <span class="tab-label">Каталог</span>
+      </button>
+      <button class="tab" data-tab="orders">
+        <span class="tab-emoji">📦</span>
+        <span class="tab-label">Мои заказы</span>
+      </button>
+      <button class="tab" data-tab="profile">
+        <span class="tab-emoji">👤</span>
+        <span class="tab-label">Профиль</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Порядок важен: данные → обёртка Telegram → навигация → экраны → запуск приложения -->
+  <script src="js/data.js"></script>
+  <script src="js/telegram.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/screens.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
