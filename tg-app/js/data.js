@@ -9,6 +9,7 @@ const BRAND = {
   name: 'Нейро.Студия',
   tagline: 'ИИ создаёт, вы получаете результат',
   welcomeSubtitle: 'Фото, дизайн, тексты и боты — с помощью ИИ',
+  botUsername: '@AIshkaGoBot',
   supportBotUsername: '@neurostudio_support', // TODO: заменить на реальный юзернейм бота поддержки
 };
 
@@ -25,10 +26,10 @@ const OFFER = {
   ],
   buttonText: 'Получить скидку 15%',
   // Ссылка на ЧАТ с ботом (не на Mini App!): цель кнопки — подписать пользователя на бота,
-  // чтобы прислать промокод в ЛС. Ссылка на сам Mini App (t.me/AIshkaGoBot/AIshkaGoBot) здесь
-  // не подходит — Telegram не умеет открывать Mini App изнутри уже открытого Mini App того же
-  // бота через openTelegramLink() и просто откроет чат, но с задержкой и ошибкой "не найдено".
-  link: 'https://t.me/AIshkaGoBot?start=from_app',
+  // чтобы прислать промокод в ЛС. Ссылка на сам Mini App здесь не подходит — Telegram не умеет
+  // открывать Mini App изнутри уже открытого Mini App того же бота через openTelegramLink()
+  // и просто откроет чат, но с задержкой и ошибкой "не найдено".
+  link: `https://t.me/${BRAND.botUsername.replace('@', '')}?start=from_app`,
 };
 
 // Категории услуг — определяют плитки на главном экране и группировку в каталоге

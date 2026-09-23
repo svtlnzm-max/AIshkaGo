@@ -71,13 +71,23 @@ function statusBadge(stepIndex) {
 
 /* ---------------------------------- ЭКРАН: приветствие ---------------------------------- */
 
+const WELCOME_BULLETS = [
+  'Выбираете услугу — например, AI-фотосессию или дизайн презентации',
+  'Описываете задачу или прикладываете фото — детали не нужны',
+  'Получаете готовый результат прямо в Telegram',
+];
+
 const WelcomeScreen = {
   render() {
+    const user = getUser();
     return `
       <div class="screen-pad welcome-screen">
         <div class="welcome-hero">${beforeAfterBlock('🖼️', 20)}</div>
-        <h1 class="welcome-title">${BRAND.tagline}</h1>
+        <h1 class="welcome-title">Привет, ${escapeHtml(user.first_name || 'Гость')}! 👋</h1>
         <p class="welcome-subtitle">${BRAND.welcomeSubtitle}</p>
+        <ul class="feature-list welcome-bullets">
+          ${WELCOME_BULLETS.map((b) => `<li>✅ ${b}</li>`).join('')}
+        </ul>
       </div>`;
   },
   onEnter() {
@@ -472,6 +482,7 @@ const ProfileScreen = {
         </div>
         <div class="profile-menu">
           <button class="profile-menu-item tappable" data-action="go-orders"><span>📦 Мои заказы</span><span class="chevron">›</span></button>
+          <button class="profile-menu-item tappable" data-action="share-bot"><span>📤 Поделиться с другом</span><span class="chevron">›</span></button>
           <button class="profile-menu-item tappable" data-action="open-support"><span>💬 Поддержка</span><span class="chevron">›</span></button>
           <button class="profile-menu-item tappable" data-action="open-about"><span>ℹ️ О сервисе</span><span class="chevron">›</span></button>
         </div>
