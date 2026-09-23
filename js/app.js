@@ -85,6 +85,10 @@ function wireGlobalActions(container) {
         openSupportChat();
         break;
 
+      case 'share-bot':
+        shareBotLink();
+        break;
+
       case 'share-result':
         hapticTap();
         shareResult(`Посмотрите, что сделала ${BRAND.name}: ${el.dataset.service}`);
@@ -127,4 +131,13 @@ function openSupportChat() {
   } else {
     showAlert(`Напишите нам: ${BRAND.supportBotUsername}`);
   }
+}
+
+/** "Поделиться с другом" — открывает нативный шаринг Telegram со ссылкой на бота */
+function shareBotLink() {
+  hapticTap();
+  const username = BRAND.botUsername.replace('@', '');
+  const botLink = `https://t.me/${username}`;
+  const shareText = `${BRAND.name} — ${BRAND.welcomeSubtitle}`;
+  openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(botLink)}&text=${encodeURIComponent(shareText)}`);
 }

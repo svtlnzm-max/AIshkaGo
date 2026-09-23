@@ -215,6 +215,7 @@ body.has-fallback-main-button #tabbar { display: none; }
 .welcome-hero { margin-bottom: 24px; }
 .welcome-title { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
 .welcome-subtitle { color: var(--tg-hint); font-size: 15px; }
+.welcome-bullets { text-align: left; margin-top: 24px; }
 
 /* ---------------------------- иконка-кружок ---------------------------- */
 
