@@ -25,6 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
   loadDraft('welcome_seen', (seen) => {
     Router.stack = [{ screen: seen ? 'catalog' : 'welcome', params: {} }];
     Router.init(container, tabbar);
+    // Оффер показываем поверх первого экрана (тоже только один раз, см. offer.js)
+    initOfferModal();
   });
 });
 
