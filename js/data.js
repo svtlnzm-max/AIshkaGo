@@ -24,7 +24,7 @@ const OFFER = {
     'Эксклюзивные акции для подписчиков',
   ],
   buttonText: 'Получить скидку 15%',
-  link: 'https://t.me/AIshkaGoBot/app',
+  link: 'https://t.me/AIshkaGoBot/AIshkaGoBot',
 };
 
 // Категории услуг — определяют плитки на главном экране и группировку в каталоге
