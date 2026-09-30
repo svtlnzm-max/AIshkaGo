@@ -6,3 +6,27 @@
 
 # Стандартный мусор Node.js (пригодится, когда появится бэкенд)
 node_modules/
+
+# --- jarvis-architect ---
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+
+# Secrets — никогда не коммитим
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Claude Code локальные настройки
+
+bot/node_modules/
+.media/
